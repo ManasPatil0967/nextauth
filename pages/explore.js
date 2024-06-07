@@ -3,21 +3,48 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { signOut } from 'next-auth/react';
 import { Router, useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 const ExploreSection = () => {
     const router = useRouter();
+    const [user, setUser] = useState(null);
     const { data: session, status } = useSession();
-    console.log(session);
+    
+    useEffect(() => {
+      if (status!== "loading" && status!== "unauthenticated" && session) {
+        const fetchData = async () => {
+          const res = await fetch('/api/auth/getters', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: session.user.email }),
+          });
+          const data = await res.json();
+          console.log(data);
+          setUser(data);
+        };
+        fetchData();
+      }
+    }, [session, status]);
+
     if (status === "loading") return <div>Loading...</div>;
-    if (status === "unauthenticated") return <div>Unauthenticated</div>;
-    else return (
+    if (status === "unauthenticated") return (
+      <>
+      <div>Unauthenticated</div>
+      {/* <button onClick={router.push("/signup")}>Sign up</button> */}
+      </>
+    );
+
+    
+    return (
     <div className="min-h-screen flex items-center justify-center py-16 bg-white">
       <div className="flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto px-4">
         <div className="md:w-1/2 mb-8 md:mb-0">
           <h2 className="text-4xl font-bold mb-4 text-gray-800">Internship Connect</h2>
           <p className="text-gray-600 mb-6">
-            Welcome {session?.user?.name || session?.user?.username || session?.user?.email}
-          </p> <br></br>
+            Welcome {session.user.name || user?.username }! You are now signed in with {session.user.email}.
+          </p>
           <p className="text-gray-600 mb-6">
             Discover potential internships, connect with employers & unlock new
             career paths.
