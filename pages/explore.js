@@ -1,24 +1,36 @@
 // components/ExploreSection.jsx
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+import { Router, useRouter } from 'next/router';
 
 const ExploreSection = () => {
+    const router = useRouter();
     const { data: session, status } = useSession();
+    console.log(session);
     if (status === "loading") return <div>Loading...</div>;
-    if (status === "unauthenticated") return <div>Not signed in</div>;
+    if (status === "unauthenticated") return <div>Unauthenticated</div>;
     else return (
-
     <div className="min-h-screen flex items-center justify-center py-16 bg-white">
       <div className="flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto px-4">
         <div className="md:w-1/2 mb-8 md:mb-0">
           <h2 className="text-4xl font-bold mb-4 text-gray-800">Internship Connect</h2>
           <p className="text-gray-600 mb-6">
+            Welcome {session?.user?.name || session?.user?.username || session?.user?.email}
+          </p> <br></br>
+          <p className="text-gray-600 mb-6">
             Discover potential internships, connect with employers & unlock new
             career paths.
           </p>
-          <a className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-md" href="/explore">
+          <a className="inline-block bg-red-500 hover:bg-red-600 m-4 text-white font-bold py-3 px-6 rounded-md" href="/explore">
               Join Now
           </a>
+          <button 
+            className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-md"
+            onClick={() => signOut().then(() => Router.push('/signup'))}
+          >
+            Sign Out
+          </button>
         </div>
         <div className="md:w-1/2">
           <div className="relative">

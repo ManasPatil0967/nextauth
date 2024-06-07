@@ -1,9 +1,9 @@
 // pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import clientPromise from "../../../lib/mongodb";
-// import NextAuth, { Credentials } from "next-auth";
 
 export default NextAuth({
   providers: [
@@ -28,7 +28,11 @@ export default NextAuth({
           return null;
         }
       }
-    })
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   adapter: MongoDBAdapter(clientPromise),
   secret: process.env.SECRET,
@@ -37,4 +41,10 @@ export default NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
+  // callbacks: {
+  //   async session({ session, token, user }) {
+  //     session.user.email = user.email;  // Add username to session
+  //     return session;
+  //   }
+  // }
 });
